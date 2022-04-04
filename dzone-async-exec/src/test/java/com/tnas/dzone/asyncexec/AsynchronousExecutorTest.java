@@ -7,21 +7,41 @@ import java.util.stream.Collectors;
 
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class AsynchronousExecutorTest {
 
-	private static final Integer NUM_ELEMENTS_TEST = 100000000;
+	private static final Integer NUM_ELEMENTS_TEST = 10000000;
 	private EasyRandom generator;
 	
 	public AsynchronousExecutorTest() {
 		this.generator = new EasyRandom();
 	}
 	
+	
 	@Test
-	void stringsUppercase() {
+	void streamUpperCase() {
+		
+		var asyncExec = new AsynchronousExecutor<String, String>(); 
+		var converter = new UpperCaseConverter();
+		
+		List<String> inputList = this.generator.objects(String.class, NUM_ELEMENTS_TEST).collect(Collectors.toList());
+		
+		Instant start = Instant.now();
+		asyncExec.processStream(inputList, converter);
+		Instant end = Instant.now();
+		
+		System.out.println("streamUpperCase: " +  Duration.between(start, end).toMillis());
+		
+		Assertions.assertEquals(inputList.size(), asyncExec.getOutput().size());
+		
+	}
+	
+	@Test
+	void subCollectionUppercase() {
 		
 		var asyncExec = new AsynchronousExecutor<String, String>(); 
 		var converter = new CollectionUpperCaseConverter();
@@ -33,13 +53,13 @@ class AsynchronousExecutorTest {
 		asyncExec.shutdown();
 		Instant end = Instant.now();
 		
-		System.out.println("stringsUppercase: " +  Duration.between(start, end).toMillis());
+		System.out.println("subCollectionUppercase: " +  Duration.between(start, end).toMillis());
 		
 		Assertions.assertEquals(inputList.size(), asyncExec.getOutput().size());
 	}
 	
 	@Test
-	void shallowStringsUppercase() {
+	void shallowElementsUppercase() {
 		
 		var asyncExec = new AsynchronousExecutor<String, String>(); 
 		var converter = new UpperCaseConverter();
@@ -49,13 +69,15 @@ class AsynchronousExecutorTest {
 	
 		Instant start = Instant.now();
 		asyncExec.processShallowPartition(inputList, converter);
+		asyncExec.shutdown();
 		Instant end = Instant.now();
-		System.out.println("shallowStringsUppercase: " + Duration.between(start, end).toMillis());
+		System.out.println("shallowElementsUppercase: " + Duration.between(start, end).toMillis());
 		
 		Assertions.assertEquals(inputList.size(), asyncExec.getOutput().size());
 		Assertions.assertLinesMatch(expectedList, asyncExec.getOutput());
 	}
 	
+	@Disabled
 	@ParameterizedTest
 	@ValueSource(ints = {1, 2, 4, 6, 8, 10})
 	void speedUpShallowStringsUpperCase(int numThreads) {
