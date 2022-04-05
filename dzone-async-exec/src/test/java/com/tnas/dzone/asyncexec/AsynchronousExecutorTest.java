@@ -20,8 +20,7 @@ class AsynchronousExecutorTest {
 	public AsynchronousExecutorTest() {
 		this.generator = new EasyRandom();
 	}
-	
-	
+
 	@Test
 	void streamUpperCase() {
 		
@@ -35,6 +34,25 @@ class AsynchronousExecutorTest {
 		Instant end = Instant.now();
 		
 		System.out.println("streamUpperCase: " +  Duration.between(start, end).toMillis());
+		
+		Assertions.assertEquals(inputList.size(), asyncExec.getOutput().size());
+	}
+
+	
+	
+	@Test
+	void parallelStreamUpperCase() {
+		
+		var asyncExec = new AsynchronousExecutor<String, String>(); 
+		var converter = new UpperCaseConverter();
+		
+		List<String> inputList = this.generator.objects(String.class, NUM_ELEMENTS_TEST).collect(Collectors.toList());
+		
+		Instant start = Instant.now();
+		asyncExec.processParallelStream(inputList, converter);
+		Instant end = Instant.now();
+		
+		System.out.println("parallelStreamUpperCase: " +  Duration.between(start, end).toMillis());
 		
 		Assertions.assertEquals(inputList.size(), asyncExec.getOutput().size());
 		
@@ -72,6 +90,25 @@ class AsynchronousExecutorTest {
 		asyncExec.shutdown();
 		Instant end = Instant.now();
 		System.out.println("shallowElementsUppercase: " + Duration.between(start, end).toMillis());
+		
+		Assertions.assertEquals(inputList.size(), asyncExec.getOutput().size());
+		Assertions.assertLinesMatch(expectedList, asyncExec.getOutput());
+	}
+	
+	@Test
+	void shallowArrayElementsUppercase() {
+		
+		var asyncExec = new AsynchronousExecutor<String, String>(); 
+		var converter = new UpperCaseConverter();
+		
+		List<String> inputList = this.generator.objects(String.class, NUM_ELEMENTS_TEST).collect(Collectors.toList());
+		var expectedList = inputList.stream().map(e -> converter.apply(e)).collect(Collectors.toList());
+	
+		Instant start = Instant.now();
+		asyncExec.processShallowArrayPartition(inputList, converter);
+		asyncExec.shutdown();
+		Instant end = Instant.now();
+		System.out.println("shallowArrayElementsUppercase: " + Duration.between(start, end).toMillis());
 		
 		Assertions.assertEquals(inputList.size(), asyncExec.getOutput().size());
 		Assertions.assertLinesMatch(expectedList, asyncExec.getOutput());

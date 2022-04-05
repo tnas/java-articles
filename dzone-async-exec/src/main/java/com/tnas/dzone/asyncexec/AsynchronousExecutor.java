@@ -33,8 +33,11 @@ public class AsynchronousExecutor<T, E> {
 		this.outputList = new ArrayList<>();
 	}
 	
-	
 	public void processStream(List<T> inputList, ElementConverter<T, E> converter) {
+		this.outputList = inputList.stream().map(e -> converter.apply(e)).collect(Collectors.toList());
+	}
+	
+	public void processParallelStream(List<T> inputList, ElementConverter<T, E> converter) {
 		this.outputList = inputList.parallelStream().map(e -> converter.apply(e)).collect(Collectors.toList());
 	}
 	
@@ -55,7 +58,7 @@ public class AsynchronousExecutor<T, E> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void processShallowPartitionOld(List<T> inputList, ElementConverter<T, E> converter) {
+	public void processShallowArrayPartition(List<T> inputList, ElementConverter<T, E> converter) {
 		
 		var chunkSize = (inputList.size() % this.numThreads == 0) ? (inputList.size() / this.numThreads) : (inputList.size() / this.numThreads) + 1;
 		Object[] outputArr = new Object[inputList.size()];
