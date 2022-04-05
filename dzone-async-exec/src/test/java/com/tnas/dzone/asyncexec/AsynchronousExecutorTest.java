@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class AsynchronousExecutorTest {
+public class AsynchronousExecutorTest {
 
 	private static final Integer NUM_ELEMENTS_TEST = 10000000;
 	private EasyRandom generator;
@@ -22,7 +22,7 @@ class AsynchronousExecutorTest {
 	}
 
 	@Test
-	void streamUpperCase() {
+	public void streamUpperCase() {
 		
 		var asyncExec = new AsynchronousExecutor<String, String>(); 
 		var converter = new UpperCaseConverter();
@@ -41,7 +41,7 @@ class AsynchronousExecutorTest {
 	
 	
 	@Test
-	void parallelStreamUpperCase() {
+	public void parallelStreamUpperCase() {
 		
 		var asyncExec = new AsynchronousExecutor<String, String>(); 
 		var converter = new UpperCaseConverter();
@@ -59,7 +59,7 @@ class AsynchronousExecutorTest {
 	}
 	
 	@Test
-	void subCollectionUppercase() {
+	public void subCollectionUppercase() {
 		
 		var asyncExec = new AsynchronousExecutor<String, String>(); 
 		var converter = new CollectionUpperCaseConverter();
@@ -77,7 +77,7 @@ class AsynchronousExecutorTest {
 	}
 	
 	@Test
-	void shallowElementsUppercase() {
+	public void shallowElementsUppercase() {
 		
 		var asyncExec = new AsynchronousExecutor<String, String>(); 
 		var converter = new UpperCaseConverter();
@@ -96,7 +96,7 @@ class AsynchronousExecutorTest {
 	}
 	
 	@Test
-	void shallowArrayElementsUppercase() {
+	public void shallowArrayElementsUppercase() {
 		
 		var asyncExec = new AsynchronousExecutor<String, String>(); 
 		var converter = new UpperCaseConverter();
@@ -117,7 +117,7 @@ class AsynchronousExecutorTest {
 	@Disabled
 	@ParameterizedTest
 	@ValueSource(ints = {1, 2, 4, 6, 8, 10})
-	void speedUpShallowStringsUpperCase(int numThreads) {
+	public void speedUpShallowStringsUpperCase(int numThreads) {
 		
 		var asyncExec = new AsynchronousExecutor<String, String>(numThreads); 
 		var converter = new UpperCaseConverter();
