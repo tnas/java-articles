@@ -20,7 +20,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 @TestMethodOrder(OrderAnnotation.class)
 public class AsynchronousExecutorTest {
 
-	private static final Integer NUM_ELEMENTS_TEST = 100;
+	private static final Integer NUM_ELEMENTS_TEST = 1000000;
 	private static final int NUM_THREADS = 8;
 	
 	private static final int NUM_REPETITIONS = 5;
@@ -72,8 +72,15 @@ public class AsynchronousExecutorTest {
 		threadsTimeMemory[threadSet - 1][repetition - 1] = time;
 	
 		if (currentThreadSet == NUM_SET_THREADS && repetition == NUM_REPETITIONS) {
-//			var stats = Arrays.asList(timeMemory).stream().mapToLong(Long::longValue).summaryStatistics();
-//			System.out.println(String.format("%s: %f (ms)", currentTest, stats.getAverage()));
+			
+			double[] averages = new double[NUM_THREADS];
+			
+			IntStream.range(0, NUM_SET_THREADS).forEach(i -> {
+				var stats = Arrays.asList(threadsTimeMemory[i]).stream().mapToLong(Long::longValue).summaryStatistics();
+				averages[i] = stats.getAverage();
+				System.out.println(String.format("%s: %d threads - %f (ms) - SpeedUp: %f", 
+						currentTest, SET_THREADS[i], averages[i], averages[0]/averages[i]));
+			});
 		}
 	}
 	
@@ -174,6 +181,7 @@ public class AsynchronousExecutorTest {
 		Assertions.assertLinesMatch(expectedList, asyncExec.getOutput());
 	}
 	
+	@Order(6)
 	@ParameterizedTest
 	@ValueSource(ints = {1, 2, 4, 6, 8, 10})
 	public void speedUpShallowPartitionArray(int numThreads) {
