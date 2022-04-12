@@ -41,7 +41,7 @@ public class AsynchronousExecutor<T, E> {
 		this.outputList = inputList.parallelStream().map(e -> converter.apply(e)).collect(Collectors.toList());
 	}
 	
-	public void processPartition(List<T> inputList, ElementConverter<List<T>, List<E>> converter) {
+	public void processSublistPartition(List<T> inputList, ElementConverter<List<T>, List<E>> converter) {
 
 		var partitioner = new CollectionPartitioner<T>(inputList, numThreads);
 
@@ -58,7 +58,7 @@ public class AsynchronousExecutor<T, E> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void processShallowArrayPartition(List<T> inputList, ElementConverter<T, E> converter) {
+	public void processShallowPartitionArray(List<T> inputList, ElementConverter<T, E> converter) {
 		
 		var chunkSize = (inputList.size() % this.numThreads == 0) ? (inputList.size() / this.numThreads) : (inputList.size() / this.numThreads) + 1;
 		Object[] outputArr = new Object[inputList.size()];
@@ -79,7 +79,7 @@ public class AsynchronousExecutor<T, E> {
 		this.outputList = (List<E>) Arrays.asList(outputArr);
 	}
 	
-	public void processShallowPartition(List<T> inputList, ElementConverter<T, E> converter) {
+	public void processShallowPartitionList(List<T> inputList, ElementConverter<T, E> converter) {
 		
 		var chunkSize = (inputList.size() % this.numThreads == 0) ? (inputList.size() / this.numThreads) : (inputList.size() / this.numThreads) + 1;
 		this.outputList = new ArrayList<>(Collections.nCopies(inputList.size(), null));
